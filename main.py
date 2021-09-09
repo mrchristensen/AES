@@ -1,15 +1,7 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 # import numpy as np
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
 def ff_mult(num1, num2):  # Num 1 will always be bigger
+    print("ff_mult() start")
     res = 0
     table = []
     mask = 0x01
@@ -25,7 +17,7 @@ def ff_mult(num1, num2):  # Num 1 will always be bigger
             print(hex(xtime(table[i - 1])))
 
         if num2 & mask != 0:
-            print("xor the thang")
+            print("xor the thing")
             print(hex(table[i]))
             res = res ^ table[i]
         mask = mask << 1
@@ -34,10 +26,12 @@ def ff_mult(num1, num2):  # Num 1 will always be bigger
     print("table:\n")
     print('\n'.join([hex(i) for i in table]))
 
+    print("ff_mult() end")
     return res
 
 
 def xtime(num):
+    print("xtime() start")
     bit_lost = False
     if num & 0x80 != 0:
         bit_lost = True
@@ -47,11 +41,11 @@ def xtime(num):
     if bit_lost:
         num = num ^ 0x11b
 
+    print("xtime() end")
     return num
 
 
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # np.set_printoptions(formatter={'int': hex})
-    print(hex(ff_mult(0x57, 0x13)))
+    print("ff_mult result: " + hex(ff_mult(0x57, 0x13)))
     # print(hex(xtime(0x70)))
