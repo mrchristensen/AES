@@ -1,7 +1,7 @@
 import unittest
 from unittest import TestCase
 
-from main import xtime, ff_mult, sub_word
+from main import xtime, ff_mult, sub_word, rot_word
 
 
 class TestAES(unittest.TestCase):
@@ -31,3 +31,7 @@ class TestKeyExpansion(TestAES):
         self.assertEqual(sub_word(0x40506070), 0x0953d051)
         self.assertEqual(sub_word(0x8090a0b0), 0xcd60e0e7)
         self.assertEqual(sub_word(0xc0d0e0f0), 0xba70e18c)
+
+    def test_rot_word(self):
+        self.assertEqual(rot_word(0x09cf4f3c), 0xcf4f3c09)
+        self.assertEqual(rot_word(0x2a6c7605), 0x6c76052a)
