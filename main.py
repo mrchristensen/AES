@@ -105,9 +105,6 @@ def xtime(num):
 def sub_word(four_byte_word):
     mask = 0x0f
     ret = 0x00
-    # array = bytearray(8)
-    # array = 0x00.to_bytes(4, "big")
-    # print("array: ", array)
     print("word: " + hex(four_byte_word))
 
     for index in range(4):
@@ -123,19 +120,16 @@ def sub_word(four_byte_word):
         print("i,j", hex(i), hex(j))
 
         byte_to_add = Sbox[i, j]
-        byte_to_add = byte_to_add | 0x000
         print("byte to add: ", hex(byte_to_add))
+
         byte_to_add_shifted = int(byte_to_add << (index * 8))
 
-        if byte_to_add_shifted < 0:
+        if byte_to_add_shifted < 0:  # Fixed the stupid signed bug if the first bit is on: https://stackoverflow.com/questions/20766813/how-to-convert-signed-to-unsigned-integer-in-python
             byte_to_add_shifted += 1 << 32
 
         print("to add to ret: ", hex(byte_to_add_shifted))
 
         ret = ret | byte_to_add_shifted
-        print("index into the array: ", 3 - index)
-        # array[index] = byte_to_add
-        # print("array so far: ", array)
         print("ret so far: ", hex(ret))
 
     print("final ret: ", hex(ret))
