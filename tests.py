@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from main import xtime, ff_mult, sub_word, rot_word, key_expansion
+from main import xtime, ff_mult, sub_word, rot_word, key_expansion, sub_bytes, shift_rows, mix_columns, add_round_key
 
 
 class TestAES(unittest.TestCase):
@@ -108,3 +108,65 @@ class TestKeyExpansion(TestAES):
         result = key_expansion(key, 256)
 
         self.assertTrue(np.array_equal(result, expected_result))
+
+
+class TestCipher(TestAES):
+    def test_sub_bytes(self):
+        state = np.array([[0x19, 0xa0, 0x9a, 0xe9],
+                          [0x3d, 0xf4, 0xc6, 0xf8],
+                          [0xe3, 0xe2, 0x8d, 0x48],
+                          [0xbe, 0x2b, 0x2a, 0x08]], dtype=np.uint8)
+
+        sub_expected_result = np.array([[0xd4, 0xe0, 0xb8, 0x1e],
+                               [0x27, 0xbf, 0xb4, 0x41],
+                               [0x11, 0x98, 0x5d, 0x52],
+                               [0xae, 0xf1, 0xe5, 0x30]], dtype=np.uint8)
+
+        sub_result = sub_bytes(state)
+
+        self.assertTrue(np.array_equal(sub_result, sub_expected_result))
+
+    def test_shift_rows(self):
+        state = np.array([[0xd4, 0xe0, 0xb8, 0x1e],
+                          [0x27, 0xbf, 0xb4, 0x41],
+                          [0x11, 0x98, 0x5d, 0x52],
+                          [0xae, 0xf1, 0xe5, 0x30]], dtype=np.uint8)
+
+        shift_expected_result = np.array([[0xd4, 0xe0, 0xb8, 0x1e],
+                                          [0xbf, 0xb4, 0x41, 0x27],
+                                          [0x5d, 0x52, 0x11, 0x98],
+                                          [0x30, 0xae, 0xf1, 0xe5]], dtype=np.uint8)
+
+        shift_result = shift_rows(state)
+
+        self.assertTrue(np.array_equal(shift_result, shift_expected_result))
+
+    def test_mix_columns(self):
+        state = np.array([[0xd4, 0xe0, 0xb8, 0x1e],
+                          [0xbf, 0xb4, 0x41, 0x27],
+                          [0x5d, 0x52, 0x11, 0x98],
+                          [0x30, 0xae, 0xf1, 0xe5]], dtype=np.uint8)
+
+        mix_expected_result = np.array([[0x04, 0xe0, 0x48, 0x28],
+                                        [0x66, 0xcb, 0xf8, 0x06],
+                                        [0x81, 0x19, 0xd3, 0x26],
+                                        [0xe5, 0x9a, 0x7a, 0x4c]], dtype=np.uint8)
+
+        mix_result = mix_columns(state)
+
+        self.assertTrue(np.array_equal(mix_result, mix_expected_result))
+
+    def test_add_round_key(self):
+        state = np.array([[0x04, 0xe0, 0x48, 0x28],
+                          [0x66, 0xcb, 0xf8, 0x06],
+                          [0x81, 0x19, 0xd3, 0x26],
+                          [0xe5, 0x9a, 0x7a, 0x4c]], dtype=np.uint8)
+
+        round_expected_result = np.array([[0xa4, 0x68, 0x6b, 0x02],
+                                          [0x9c, 0x9f, 0x5b, 0x6a],
+                                          [0x7f, 0x35, 0xea, 0x50],
+                                          [0xf2, 0x2b, 0x43, 0x49]], dtype=np.uint8)
+
+        round_result = add_round_key(state,w,4)
+
+        self.assertTrue(np.array_equal(round_result, round_expected_result))
