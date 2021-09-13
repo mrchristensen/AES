@@ -85,37 +85,37 @@ def get_Nr(AES_type):
 
 
 def ff_mult(num1, num2):  # Num 1 will always be bigger
-    print("ff_mult() start")
+    # print("ff_mult() start")
     res = 0
     table = []
     mask = 0x01
 
     for i in range(0, 8):
-        print(i)
+        # print(i)
 
         if i == 0:
             table.append(num1)
-            print(hex(num1))
+            # print(hex(num1))
         else:
             table.append(xtime(table[i - 1]))
-            print(hex(xtime(table[i - 1])))
+            # print(hex(xtime(table[i - 1])))
 
         if num2 & mask != 0:
-            print("xor the thing")
-            print(hex(table[i]))
+            # print("xor the thing")
+            # print(hex(table[i]))
             res = res ^ table[i]
         mask = mask << 1
 
     # print(table)
-    print("table:\n")
-    print('\n'.join([hex(i) for i in table]))
+    # print("table:\n")
+    # print('\n'.join([hex(i) for i in table]))
 
-    print("ff_mult() end")
+    # print("ff_mult() end")
     return res
 
 
 def xtime(num):
-    print("xtime() start")
+    # print("xtime() start")
     bit_lost = False
     if num & 0x80 != 0:
         bit_lost = True
@@ -125,7 +125,7 @@ def xtime(num):
     if bit_lost:
         num = num ^ 0x11b
 
-    print("xtime() end")
+    # print("xtime() end")
     return num
 
 
@@ -262,6 +262,21 @@ def shift_rows(state):
         state[i] = np.roll(state[i], 4 - i)
         print("new state:\n", state)
 
+    return state
+
+
+def mix_columns(state):
+    print("og state:\n", state)
+    state_copy = np.copy(state)
+    for c in range(4):
+        print("\ncol: ", c)
+        state[0, c] = ff_mult(state_copy[0, c], 0x02) ^ ff_mult(state_copy[1, c], 0x03) ^ state_copy[2, c] ^ state_copy[3, c]
+        state[1, c] = state_copy[0, c] ^ ff_mult(state_copy[1, c], 0x02) ^ ff_mult(state_copy[2, c], 0x03) ^ state_copy[3, c]
+        state[2, c] = state_copy[0, c] ^ state_copy[1, c] ^ ff_mult(state_copy[2, c], 0x02) ^ ff_mult(state_copy[3, c], 0x03)
+        state[3, c] = ff_mult(state_copy[0, c], 0x03) ^ state_copy[1, c] ^ state_copy[2, c] ^ ff_mult(state_copy[3, c], 0x02)
+        print("new state:\n", state)
+
+    print("final state:\n", state)
     return state
 
 
