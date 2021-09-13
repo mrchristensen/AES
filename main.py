@@ -136,8 +136,42 @@ def sub_word(four_byte_word):
     return ret
 
 
+def rot_word(four_byte_word):
+    res = 0x00
+    mask = 0xff000000
+    print("original word: ", hex(four_byte_word))
+
+    byte = four_byte_word & mask
+    print("byte: ", hex(byte))
+
+    byte_shifted = byte >> 24
+    print("byte shifted: ", hex(byte_shifted))
+
+    res = res | byte_shifted
+    print("res: ", hex(res))
+
+
+    for index in range(3):
+        mask = mask >> 8
+
+        print("index: ", index)
+        print("mask: ", hex(mask))
+
+        byte = (four_byte_word & mask)
+        print("byte: ", hex(byte))
+
+        byte_shifted = byte << 8
+        print("byte shifted: ", hex(byte_shifted))
+
+        res = res | byte_shifted
+        print("res so far: ", hex(res))
+
+
+    return res
+
+
 if __name__ == '__main__':
     np.set_printoptions(formatter={'int': hex})
-    sub_word(0x8090a0b0)
+    rot_word(0x09cf4f3c)
     # print("ff_mult result: " + hex(ff_mult(0x57, 0x13)))
     # print(hex(xtime(0x70)))
