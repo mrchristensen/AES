@@ -112,21 +112,23 @@ class TestKeyExpansion(TestAES):
 
 class TestCipher(TestAES):
     def test_sub_bytes(self):
+        np.set_printoptions(formatter={'int': hex})
         state = np.array([[0x19, 0xa0, 0x9a, 0xe9],
                           [0x3d, 0xf4, 0xc6, 0xf8],
                           [0xe3, 0xe2, 0x8d, 0x48],
                           [0xbe, 0x2b, 0x2a, 0x08]], dtype=np.uint8)
 
         sub_expected_result = np.array([[0xd4, 0xe0, 0xb8, 0x1e],
-                               [0x27, 0xbf, 0xb4, 0x41],
-                               [0x11, 0x98, 0x5d, 0x52],
-                               [0xae, 0xf1, 0xe5, 0x30]], dtype=np.uint8)
+                                        [0x27, 0xbf, 0xb4, 0x41],
+                                        [0x11, 0x98, 0x5d, 0x52],
+                                        [0xae, 0xf1, 0xe5, 0x30]], dtype=np.uint8)
 
         sub_result = sub_bytes(state)
 
         self.assertTrue(np.array_equal(sub_result, sub_expected_result))
 
     def test_shift_rows(self):
+        np.set_printoptions(formatter={'int': hex})
         state = np.array([[0xd4, 0xe0, 0xb8, 0x1e],
                           [0x27, 0xbf, 0xb4, 0x41],
                           [0x11, 0x98, 0x5d, 0x52],
@@ -139,9 +141,12 @@ class TestCipher(TestAES):
 
         shift_result = shift_rows(state)
 
+        print("expected state:\n", shift_expected_result)
+
         self.assertTrue(np.array_equal(shift_result, shift_expected_result))
 
-    def test_mix_columns(self):
+    def test_mix_columns_1(self):
+        np.set_printoptions(formatter={'int': hex})
         state = np.array([[0xd4, 0xe0, 0xb8, 0x1e],
                           [0xbf, 0xb4, 0x41, 0x27],
                           [0x5d, 0x52, 0x11, 0x98],
@@ -156,7 +161,24 @@ class TestCipher(TestAES):
 
         self.assertTrue(np.array_equal(mix_result, mix_expected_result))
 
+    def test_mix_columns_2(self):
+        np.set_printoptions(formatter={'int': hex})
+        state = np.array([[0x49, 0x45, 0x7f, 0x77],
+                          [0xdb, 0x39, 0x02, 0xde],
+                          [0x87, 0x53, 0xd2, 0x96],
+                          [0x3b, 0x89, 0xf1, 0x1a]], dtype=np.uint8)
+
+        mix_expected_result = np.array([[0x58, 0x1b, 0xdb, 0x1b],
+                                        [0x4d, 0x4b, 0xe7, 0x6b],
+                                        [0xca, 0x5a, 0xca, 0xb0],
+                                        [0xf1, 0xac, 0xa8, 0xe5]], dtype=np.uint8)
+
+        mix_result = mix_columns(state)
+
+        self.assertTrue(np.array_equal(mix_result, mix_expected_result))
+
     def test_add_round_key(self):
+        np.set_printoptions(formatter={'int': hex})
         state = np.array([[0x04, 0xe0, 0x48, 0x28],
                           [0x66, 0xcb, 0xf8, 0x06],
                           [0x81, 0x19, 0xd3, 0x26],
