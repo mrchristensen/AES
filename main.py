@@ -56,6 +56,33 @@ InvSbox = np.array([
     [0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d]
     ])
 
+def get_Nk(AES_type):
+    if AES_type == 128:
+        return 4
+    elif AES_type == 192:
+        return 6
+    elif AES_type == 256:
+        return 8
+    else:
+        return None
+
+def get_Nb(AES_type):
+    if AES_type == 128 or AES_type == 192 or AES_type == 256:
+        return 4
+    else:
+        return None
+
+
+def get_Nr(AES_type):
+    if AES_type == 128:
+        return 10
+    elif AES_type == 192:
+        return 12
+    elif AES_type == 256:
+        return 14
+    else:
+        return None
+
 
 def ff_mult(num1, num2):  # Num 1 will always be bigger
     print("ff_mult() start")
@@ -170,8 +197,70 @@ def rot_word(four_byte_word):
     return res
 
 
+def key_expansion(key, AES_type):  # Nk = Number of 32-bit words comprising the Cipher Key. (Nk = 4, 6, or 8) (Also see Sec. 6.3.)
+    Nb = get_Nb(AES_type)
+    Nr = get_Nr(AES_type)
+    Nk = get_Nk(AES_type)
+
+    word = np.zeros(shape=Nb*(Nr+1), dtype=np.uint)
+    print("empty word: ", word.astype(int))
+    temp = np.empty(shape=Nb*(Nr+1))
+
+    i = 0
+
+    while i < Nk:
+        print("\ni: ", i)
+        next_word = int.from_bytes(bytearray([key[4 * i], key[4 * i + 1], key[4 * i + 2], key[4 * i + 3]]), "big")
+        print("Next word: ", np.array([key[4 * i], key[4 * i + 1], key[4 * i + 2], key[4 * i + 3]]))
+        print("Next word converted: ", hex(next_word))
+
+        word[i] = next_word
+        print(word.astype(int))
+        i = i + 1
+
+        if next_word & 0x80000000 > 0:
+            print("got em")
+            word[i] = word[i] + 1 << 32  # todo: turn this into a function
+            print("new word:\n", word)
+
+    print("\n\nFinished initial loop\n")
+
+    i = Nk
+
+    while i < Nb * (Nr + 1):
+        temp = word[i - 1]
+        print("temp:\n", temp)
+        if i:
+            temp = sub_word(rot_word(temp)) ^ Rcon[int(i / Nk)]
+        elif Nk > 6 and i % Nk == 4:
+            temp = sub_word(temp)
+        word[i] = word[i - Nk] ^ temp
+        i = i + 1
+
+    print("final word:\n", word)
+    return word
+
+
 if __name__ == '__main__':
     np.set_printoptions(formatter={'int': hex})
-    rot_word(0x09cf4f3c)
+    key = np.array([0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
+                    0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c])
+
+    expected_result = np.array([
+        0x2b7e1516, 0x28aed2a6, 0xabf71588, 0x09cf4f3c,
+        0xa0fafe17, 0x88542cb1, 0x23a33939, 0x2a6c7605,
+        0xf2c295f2, 0x7a96b943, 0x5935807a, 0x7359f67f,
+        0x3d80477d, 0x4716fe3e, 0x1e237e44, 0x6d7a883b,
+        0xef44a541, 0xa8525b7f, 0xb671253b, 0xdb0bad00,
+        0xd4d1c6f8, 0x7c839d87, 0xcaf2b8bc, 0x11f915bc,
+        0x6d88a37a, 0x110b3efd, 0xdbf98641, 0xca0093fd,
+        0x4e54f70e, 0x5f5fc9f3, 0x84a64fb2, 0x4ea6dc4f,
+        0xead27321, 0xb58dbad2, 0x312bf560, 0x7f8d292f,
+        0xac7766f3, 0x19fadc21, 0x28d12941, 0x575c006e,
+        0xd014f9a8, 0xc9ee2589, 0xe13f0cc8, 0xb6630ca6])
+
+    key_expansion(key, 128)
+    print(expected_result)
+    # rot_word(0x09cf4f3c)
     # print("ff_mult result: " + hex(ff_mult(0x57, 0x13)))
     # print(hex(xtime(0x70)))
