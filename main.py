@@ -16,7 +16,7 @@ Rcon = np.array([
     0x94000000, 0x33000000, 0x66000000, 0xCC000000,
     0x83000000, 0x1D000000, 0x3A000000, 0x74000000,
     0xE8000000, 0xCB000000, 0x8D000000
-    ])
+])
 
 Sbox = np.array([
     [0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76],
@@ -35,7 +35,7 @@ Sbox = np.array([
     [0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e, 0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e],
     [0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf],
     [0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16]
-    ])
+])
 
 InvSbox = np.array([
     [0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38, 0xbf, 0x40, 0xa3, 0x9e, 0x81, 0xf3, 0xd7, 0xfb],
@@ -54,7 +54,8 @@ InvSbox = np.array([
     [0x60, 0x51, 0x7f, 0xa9, 0x19, 0xb5, 0x4a, 0x0d, 0x2d, 0xe5, 0x7a, 0x9f, 0x93, 0xc9, 0x9c, 0xef],
     [0xa0, 0xe0, 0x3b, 0x4d, 0xae, 0x2a, 0xf5, 0xb0, 0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61],
     [0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d]
-    ])
+])
+
 
 def get_Nk(AES_type):
     if AES_type == 128:
@@ -65,6 +66,7 @@ def get_Nk(AES_type):
         return 8
     else:
         return None
+
 
 def get_Nb(AES_type):
     if AES_type == 128 or AES_type == 192 or AES_type == 256:
@@ -195,14 +197,15 @@ def rot_word(four_byte_word):
     return res
 
 
-def key_expansion(key, AES_type):  # Nk = Number of 32-bit words comprising the Cipher Key. (Nk = 4, 6, or 8) (Also see Sec. 6.3.)
+def key_expansion(key,
+                  AES_type):  # Nk = Number of 32-bit words comprising the Cipher Key. (Nk = 4, 6, or 8) (Also see Sec. 6.3.)
     Nb = get_Nb(AES_type)
     Nr = get_Nr(AES_type)
     Nk = get_Nk(AES_type)
 
-    word = np.zeros(shape=Nb*(Nr+1), dtype=np.uint)
+    word = np.zeros(shape=Nb * (Nr + 1), dtype=np.uint)
     # print("empty word: ", word.astype(int))
-    temp = np.empty(shape=Nb*(Nr+1))
+    temp = np.empty(shape=Nb * (Nr + 1))
 
     i = 0
 
@@ -268,10 +271,14 @@ def mix_columns(state):
     state_copy = np.copy(state)
     for c in range(4):
         # print("\ncol: ", c)
-        state[0, c] = ff_mult(state_copy[0, c], 0x02) ^ ff_mult(state_copy[1, c], 0x03) ^ state_copy[2, c] ^ state_copy[3, c]
-        state[1, c] = state_copy[0, c] ^ ff_mult(state_copy[1, c], 0x02) ^ ff_mult(state_copy[2, c], 0x03) ^ state_copy[3, c]
-        state[2, c] = state_copy[0, c] ^ state_copy[1, c] ^ ff_mult(state_copy[2, c], 0x02) ^ ff_mult(state_copy[3, c], 0x03)
-        state[3, c] = ff_mult(state_copy[0, c], 0x03) ^ state_copy[1, c] ^ state_copy[2, c] ^ ff_mult(state_copy[3, c], 0x02)
+        state[0, c] = ff_mult(state_copy[0, c], 0x02) ^ ff_mult(state_copy[1, c], 0x03) ^ state_copy[2, c] ^ state_copy[
+            3, c]
+        state[1, c] = state_copy[0, c] ^ ff_mult(state_copy[1, c], 0x02) ^ ff_mult(state_copy[2, c], 0x03) ^ state_copy[
+            3, c]
+        state[2, c] = state_copy[0, c] ^ state_copy[1, c] ^ ff_mult(state_copy[2, c], 0x02) ^ ff_mult(state_copy[3, c],
+                                                                                                      0x03)
+        state[3, c] = ff_mult(state_copy[0, c], 0x03) ^ state_copy[1, c] ^ state_copy[2, c] ^ ff_mult(state_copy[3, c],
+                                                                                                      0x02)
         # print("new state:\n", state)
 
     # print("final state:\n", state)
@@ -281,9 +288,9 @@ def mix_columns(state):
 def add_round_key(state, w):
     # return np.bitwise_or(state, w)
     new_state = np.array([[0x00, 0x00, 0x00, 0x00],
-                      [0x00, 0x00, 0x00, 0x00],
-                      [0x00, 0x00, 0x00, 0x00],
-                      [0x00, 0x00, 0x00, 0x00]], dtype=np.uint8)
+                          [0x00, 0x00, 0x00, 0x00],
+                          [0x00, 0x00, 0x00, 0x00],
+                          [0x00, 0x00, 0x00, 0x00]], dtype=np.uint8)
 
     for col in range(4):
         for row in range(4):
@@ -315,6 +322,7 @@ def create_byte_matrix(array):
 
     return byte_matrix
 
+
 def cipher(input, key, type):
     Nb = get_Nb(type)
     Nr = get_Nr(type)
@@ -329,7 +337,6 @@ def cipher(input, key, type):
     print(create_byte_matrix(w[0:4]))
 
     state = add_round_key(state, create_byte_matrix(w[0:Nb]))  # See Sec. 5.1.4
-
 
     for round in range(1, Nr):  # for round = 1 step 1 to Nr–1: #todo: make sure range is good
         print("\nround:\n", round)
@@ -349,8 +356,8 @@ def cipher(input, key, type):
     print("\nafter sub_bytes:\n", state)
     state = shift_rows(state)
     print("\nafter shift_rows:\n", state)
-    print("round Key value:\n", create_byte_matrix(w[Nr*Nb:(Nr + 1) * Nb]))
-    state = add_round_key(state, create_byte_matrix(w[Nr*Nb:(Nr + 1) * Nb]))
+    print("round Key value:\n", create_byte_matrix(w[Nr * Nb:(Nr + 1) * Nb]))
+    state = add_round_key(state, create_byte_matrix(w[Nr * Nb:(Nr + 1) * Nb]))
     print("output:\n", state)
 
     return state
@@ -385,6 +392,26 @@ def format_output(array):
 if __name__ == '__main__':
     np.set_printoptions(formatter={'int': hex})
 
-    # rot_word(0x09cf4f3c)
-    # print("ff_mult result: " + hex(ff_mult(0x57, 0x13)))
-    # print(hex(xtime(0x70)))
+    print("Let's do encryption:\n")
+    aes_type = None
+    while aes_type != 128 and aes_type != 192 and aes_type != 256:
+        print("Input AES type (128, 192, or 256): ")
+        aes_type = int(input())
+
+    print("Input the key: ")
+    key_input = input()
+
+    print("Input the message: ")
+    plain_text = input()
+
+    parsed_plain_text = parse_input_string(plain_text)
+    print("parsed_plain_text:\n", parsed_plain_text)
+    parsed_key = parse_input_string(key_input)
+    print("parsed_key:\n", parsed_key)
+
+    output = cipher(parsed_plain_text, parsed_key, aes_type)
+    print("output (un=formatted): ", output)
+
+    formatted_output = format_output(output)
+    print("output (formatted): ", formatted_output)
+
