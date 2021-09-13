@@ -280,6 +280,16 @@ def shift_rows(state):
     return state
 
 
+def inv_shift_rows(state):
+    # print("og state:\n", state)
+    for i in range(4):
+        # print("i: ", i)
+        state[i] = np.roll(state[i], i)
+        # print("new state:\n", state)
+
+    return state
+
+
 def mix_columns(state):
     # print("og state:\n", state)
     state_copy = np.copy(state)
