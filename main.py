@@ -255,6 +255,16 @@ def sub_bytes(state):
     return state
 
 
+def shift_rows(state):
+    print("og state:\n", state)
+    for i in range(4):
+        print("i: ", i)
+        state[i] = np.roll(state[i], 4 - i)
+        print("new state:\n", state)
+
+    return state
+
+
 if __name__ == '__main__':
     np.set_printoptions(formatter={'int': hex})
 
