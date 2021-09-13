@@ -492,6 +492,28 @@ def encrypt():
     print("output (formatted): ", formatted_output)
 
 
+def decrypt():
+    print("Let's do decryption:\n")
+    aes_type = None
+    while aes_type != 128 and aes_type != 192 and aes_type != 256:
+        aes_type = int(input("Input AES type (128, 192, or 256): "))
+
+    key_input = input("Input the key: ")
+
+    encrypted_text = input("Input the message: ")
+
+    parsed_encrypted_text = parse_input_string(encrypted_text)
+    print("parsed_encrypted_text:\n", parsed_encrypted_text)
+    parsed_key = parse_input_string(key_input)
+    print("parsed_key:\n", parsed_key)
+
+    output = inv_cipher(parsed_encrypted_text, parsed_key, aes_type)
+    print("output (un=formatted): ", output)
+
+    formatted_output = format_output(output)
+    print("output (formatted): ", formatted_output)
+
+
 if __name__ == '__main__':
     np.set_printoptions(formatter={'int': hex})
 
@@ -501,7 +523,7 @@ if __name__ == '__main__':
         if mode == "encrypt":
             encrypt()
         elif mode == "decrypt":
-            pass
+            decrypt()
         elif mode == "exit":
             exit()
 
