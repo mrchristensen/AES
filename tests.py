@@ -56,4 +56,4 @@ class TestKeyExpansion(TestAES):
 
         result = key_expansion(key, 128)
 
-        self.assertEqual(result, expected_result)
+        self.assertTrue(np.array_equal(result, expected_result))
