@@ -2,8 +2,9 @@ import unittest
 import numpy as np
 import main as AES
 
-from main import xtime, ff_mult, sub_word, rot_word, key_expansion, sub_bytes, shift_rows, mix_columns, add_round_key,\
-                 cipher, create_byte_matrix, parse_input_string, format_output, inv_sub_bytes, inv_shift_rows
+from main import xtime, ff_mult, sub_word, rot_word, key_expansion, sub_bytes, shift_rows, mix_columns, add_round_key, \
+    cipher, create_byte_matrix, parse_input_string, format_output, inv_sub_bytes, inv_shift_rows, \
+    inv_cipher  # , inv_mix_columns
 
 
 class TestAES(unittest.TestCase):
@@ -121,7 +122,7 @@ class TestInvCipher(TestAES):
                           [0x2b, 0xef, 0xfd, 0x9f],
                           [0x3d, 0xca, 0x4e, 0xa7]], dtype=np.uint8)
 
-        sub_expected_result = np.array([[0xbd,0x6e, 0x7c, 0x3d],
+        sub_expected_result = np.array([[0xbd, 0x6e, 0x7c, 0x3d],
                                         [0xf2, 0xb5, 0x77, 0x9e],
                                         [0x0b, 0x61, 0x21, 0x6e],
                                         [0x8b, 0x10, 0xb6, 0x89]], dtype=np.uint8)
@@ -151,6 +152,44 @@ class TestInvCipher(TestAES):
 
         self.assertTrue(np.array_equal(shift_result, shift_expected_result))
 
+    # def test_inv_mix_columns(self):
+    #     np.set_printoptions(formatter={'int': hex})
+    #     state = parse_input_string("7ad5fda789ef4e272bca100b3d9ff59f").reshape((4, 4)).T
+    #
+    #     mix_expected_result = np.array([[0x04, 0xe0, 0x48, 0x28],
+    #                                     [0x66, 0xcb, 0xf8, 0x06],
+    #                                     [0x81, 0x19, 0xd3, 0x26],
+    #                                     [0xe5, 0x9a, 0x7a, 0x4c]], dtype=np.uint8)
+    #
+    #     mix_result = inv_mix_columns(state)
+    #
+    #     self.assertTrue(np.array_equal(mix_result, mix_expected_result))
+
+    def test_inv_cipher(self):
+        np.set_printoptions(formatter={'int': hex})
+
+        key = parse_input_string("000102030405060708090a0b0c0d0e0f")
+
+        print(key)
+
+        state = parse_input_string("00112233445566778899aabbccddeeff")
+
+        print(state)
+
+        out_expected_result = parse_input_string("00112233445566778899aabbccddeeff").reshape((4, 4)).T
+
+        print(out_expected_result)
+
+        # formatted_expected_out = create_byte_matrix(out_expected_result)
+        #
+        # print("formatted_expected_out:\n", formatted_expected_out)
+
+        out_result = inv_cipher(state, key, 128)
+
+        print("out_result:\n", out_result)
+        print("out_expected_result:\n", out_expected_result)
+
+        self.assertTrue(np.array_equal(out_result, out_expected_result))
 
 
 class TestCipher(TestAES):
@@ -237,7 +276,7 @@ class TestCipher(TestAES):
 
         w = np.array([0xa0fafe17, 0x88542cb1, 0x23a33939, 0x2a6c7605])
 
-        round_result = add_round_key(state,create_byte_matrix(w))
+        round_result = add_round_key(state, create_byte_matrix(w))
 
         self.assertTrue(np.array_equal(round_result, round_expected_result))
 
@@ -279,7 +318,6 @@ class TestMain(TestAES):
         print("parsed_plain_text:\n", parsed_plain_text)
         parsed_key = parse_input_string(key_string)
         print("parsed_key:\n", parsed_key)
-
 
         output = cipher(parsed_plain_text, parsed_key, 128)
 
