@@ -3,7 +3,7 @@ import numpy as np
 import main as AES
 
 from main import xtime, ff_mult, sub_word, rot_word, key_expansion, sub_bytes, shift_rows, mix_columns, add_round_key,\
-                 cipher, create_byte_matrix, parse_input_string, format_output
+                 cipher, create_byte_matrix, parse_input_string, format_output, inv_sub_bytes
 
 
 class TestAES(unittest.TestCase):
@@ -110,6 +110,25 @@ class TestKeyExpansion(TestAES):
         result = key_expansion(key, 256)
 
         self.assertTrue(np.array_equal(result, expected_result))
+
+
+class TestInvCipher(TestAES):
+    def test_inv_sub_bytes(self):
+        np.set_printoptions(formatter={'int': hex})
+
+        state = np.array([[0x7a, 0x9f, 0x10, 0x27],
+                          [0x89, 0xd5, 0xf5, 0x0b],
+                          [0x2b, 0xef, 0xfd, 0x9f],
+                          [0x3d, 0xca, 0x4e, 0xa7]], dtype=np.uint8)
+
+        sub_expected_result = np.array([[0xbd,0x6e, 0x7c, 0x3d],
+                                        [0xf2, 0xb5, 0x77, 0x9e],
+                                        [0x0b, 0x61, 0x21, 0x6e],
+                                        [0x8b, 0x10, 0xb6, 0x89]], dtype=np.uint8)
+
+        sub_result = inv_sub_bytes(state)
+
+        self.assertTrue(np.array_equal(sub_result, sub_expected_result))
 
 
 class TestCipher(TestAES):
