@@ -402,6 +402,47 @@ def cipher(input, key, type):
     return state
 
 
+def inv_cipher(input, key, type):
+    Nb = get_Nb(type)
+    Nr = get_Nr(type)
+
+    print("input:\n", input)
+    state = input.reshape(4, 4).T
+    print("state:\n", state)
+    print("key:\n", key)
+    w = key_expansion(key, type)
+    print("w:\n", w)
+
+    state = add_round_key(state, create_byte_matrix(w[Nr * Nb:(Nr + 1) * Nb]))  # See Sec. 5.1.4
+
+    for round in reversed(range(1, Nr)):  # for round = 1 step 1 to Nr–1: #todo: make sure range is good
+        print("\nround:\n", round)
+        print("start of round:\n", state)
+
+        state = inv_shift_rows(state)  # See Sec. 5.1.2
+        print("\nafter inv_shift_rows:\n", state)
+        state = inv_sub_bytes(state)  # See Sec. 5.1.1
+        print("\nafter inv_sub_bytes:\n", state)
+        state = add_round_key(state, create_byte_matrix(w[round * Nb:(round + 1) * Nb]))
+        print("round Key value:\n", create_byte_matrix(w[round * Nb:(round + 1) * Nb]))
+        state = inv_mix_columns(state)  # See Sec. 5.1.3
+        print("\nafter inv_mix_columns:\n", state)
+
+    print("\nround: 10 (special round)\n")
+    print("start of round:\n", state)
+
+    state = inv_shift_rows(state)
+    print("\nafter inv_shift_rows:\n", state)
+    state = inv_sub_bytes(state)
+    print("\nafter inv_sub_bytes:\n", state)
+    print("round Key value:\n", create_byte_matrix(w[0:Nb]))
+    state = add_round_key(state, create_byte_matrix(w[0:Nb]))
+
+    print("output:\n", state)
+
+    return state
+
+
 def parse_input_string(input_string):
     return np.array([int(input_string[i:i + 2], base=16) for i in range(0, len(input_string), 2)])
 
