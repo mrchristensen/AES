@@ -132,67 +132,65 @@ def xtime(num):
 def sub_word(four_byte_word):
     mask = 0x0f
     ret = 0x00
-    print("word: " + hex(four_byte_word))
+    # print("word: " + hex(four_byte_word))
 
     for index in range(4):
-        print("index: ", index)
+        # print("index: ", index)
 
-        print("mask: ", hex(mask))
+        # print("mask: ", hex(mask))
         j = (four_byte_word & mask) >> (2 * index) * 4
         mask = mask << 4
-        print("mask: ", hex(mask))
+        # print("mask: ", hex(mask))
         i = (four_byte_word & mask) >> (2 * index) * 4 + 4
         mask = mask << 4
 
-        print("i,j", hex(i), hex(j))
+        # print("i,j", hex(i), hex(j))
 
         byte_to_add = Sbox[i, j]
-        print("byte to add: ", hex(byte_to_add))
+        # print("byte to add: ", hex(byte_to_add))
 
         byte_to_add_shifted = int(byte_to_add << (index * 8))
 
         if byte_to_add_shifted < 0:  # Fixed the stupid signed bug if the first bit is on: https://stackoverflow.com/questions/20766813/how-to-convert-signed-to-unsigned-integer-in-python
             byte_to_add_shifted += 1 << 32
 
-        print("to add to ret: ", hex(byte_to_add_shifted))
+        # print("to add to ret: ", hex(byte_to_add_shifted))
 
         ret = ret | byte_to_add_shifted
-        print("ret so far: ", hex(ret))
+        # print("ret so far: ", hex(ret))
 
-    print("final ret: ", hex(ret))
+    # print("final ret: ", hex(ret))
     return ret
 
 
 def rot_word(four_byte_word):
     res = 0x00
     mask = 0xff000000
-    print("original word: ", hex(four_byte_word))
+    # print("original word: ", hex(four_byte_word))
 
     byte = four_byte_word & mask
-    print("byte: ", hex(byte))
+    # print("byte: ", hex(byte))
 
     byte_shifted = byte >> 24
-    print("byte shifted: ", hex(byte_shifted))
+    # print("byte shifted: ", hex(byte_shifted))
 
     res = res | byte_shifted
-    print("res: ", hex(res))
-
+    # print("res: ", hex(res))
 
     for index in range(3):
         mask = mask >> 8
 
-        print("index: ", index)
-        print("mask: ", hex(mask))
+        # print("index: ", index)
+        # print("mask: ", hex(mask))
 
         byte = (four_byte_word & mask)
-        print("byte: ", hex(byte))
+        # print("byte: ", hex(byte))
 
         byte_shifted = byte << 8
-        print("byte shifted: ", hex(byte_shifted))
+        # print("byte shifted: ", hex(byte_shifted))
 
         res = res | byte_shifted
-        print("res so far: ", hex(res))
-
+        # print("res so far: ", hex(res))
 
     return res
 
@@ -203,33 +201,33 @@ def key_expansion(key, AES_type):  # Nk = Number of 32-bit words comprising the 
     Nk = get_Nk(AES_type)
 
     word = np.zeros(shape=Nb*(Nr+1), dtype=np.uint)
-    print("empty word: ", word.astype(int))
+    # print("empty word: ", word.astype(int))
     temp = np.empty(shape=Nb*(Nr+1))
 
     i = 0
 
     while i < Nk:
-        print("\ni: ", i)
+        # print("\ni: ", i)
         next_word = int.from_bytes(bytearray([key[4 * i], key[4 * i + 1], key[4 * i + 2], key[4 * i + 3]]), "big")
-        print("Next word: ", np.array([key[4 * i], key[4 * i + 1], key[4 * i + 2], key[4 * i + 3]]))
-        print("Next word converted: ", hex(next_word))
+        # print("Next word: ", np.array([key[4 * i], key[4 * i + 1], key[4 * i + 2], key[4 * i + 3]]))
+        # print("Next word converted: ", hex(next_word))
 
         word[i] = next_word
-        print(word.astype(int))
+        # print(word.astype(int))
         i = i + 1
 
         if next_word & 0x80000000 > 0:
-            print("got em")
+            # print("got em")
             word[i] = word[i] + 1 << 32  # todo: turn this into a function
-            print("new word:\n", word)
+            # print("new word:\n", word)
 
-    print("\n\nFinished initial loop\n")
+    # print("\n\nFinished initial loop\n")
 
     i = Nk
 
     while i < Nb * (Nr + 1):
         temp = word[i - 1]
-        print("temp:\n", temp)
+        # print("temp:\n", temp)
         if i % Nk == 0:
             temp = sub_word(rot_word(temp)) ^ Rcon[int(i / Nk)]
         elif Nk > 6 and i % Nk == 4:
@@ -237,53 +235,129 @@ def key_expansion(key, AES_type):  # Nk = Number of 32-bit words comprising the 
         word[i] = word[i - Nk] ^ temp
         i = i + 1
 
-    print("final word:\n", word)
+    # print("final word:\n", word)
     return word
 
 
 def sub_bytes(state):
-    print("og state:\n", state)
+    # print("og state:\n", state)
     with np.nditer(state, op_flags=['readwrite']) as it:
         for byte in it:
-            print("byte: ", hex(byte))
+            # print("byte: ", hex(byte))
             i = (byte & 0xf0) >> 4
             j = byte & 0x0f
-            print("i, j: ", hex(i), hex(j))
+            # print("i, j: ", hex(i), hex(j))
             byte[...] = Sbox[i, j]
-            print("new byte: ", hex(byte))
-            print("new state:\n", state)
+            # print("new byte: ", hex(byte))
+            # print("new state:\n", state)
     return state
 
 
 def shift_rows(state):
-    print("og state:\n", state)
+    # print("og state:\n", state)
     for i in range(4):
-        print("i: ", i)
+        # print("i: ", i)
         state[i] = np.roll(state[i], 4 - i)
-        print("new state:\n", state)
+        # print("new state:\n", state)
 
     return state
 
 
 def mix_columns(state):
-    print("og state:\n", state)
+    # print("og state:\n", state)
     state_copy = np.copy(state)
     for c in range(4):
-        print("\ncol: ", c)
+        # print("\ncol: ", c)
         state[0, c] = ff_mult(state_copy[0, c], 0x02) ^ ff_mult(state_copy[1, c], 0x03) ^ state_copy[2, c] ^ state_copy[3, c]
         state[1, c] = state_copy[0, c] ^ ff_mult(state_copy[1, c], 0x02) ^ ff_mult(state_copy[2, c], 0x03) ^ state_copy[3, c]
         state[2, c] = state_copy[0, c] ^ state_copy[1, c] ^ ff_mult(state_copy[2, c], 0x02) ^ ff_mult(state_copy[3, c], 0x03)
         state[3, c] = ff_mult(state_copy[0, c], 0x03) ^ state_copy[1, c] ^ state_copy[2, c] ^ ff_mult(state_copy[3, c], 0x02)
-        print("new state:\n", state)
+        # print("new state:\n", state)
 
-    print("final state:\n", state)
+    # print("final state:\n", state)
+    return state
+
+
+def add_round_key(state, w):
+    # return np.bitwise_or(state, w)
+    new_state = np.array([[0x00, 0x00, 0x00, 0x00],
+                      [0x00, 0x00, 0x00, 0x00],
+                      [0x00, 0x00, 0x00, 0x00],
+                      [0x00, 0x00, 0x00, 0x00]], dtype=np.uint8)
+
+    for col in range(4):
+        for row in range(4):
+            new_state[col, row] = state[col, row] ^ w[col, row]
+
+    return new_state
+
+
+def create_byte_matrix(array):
+    byte_matrix = np.array([[0x00, 0x00, 0x00, 0x00],
+                            [0x00, 0x00, 0x00, 0x00],
+                            [0x00, 0x00, 0x00, 0x00],
+                            [0x00, 0x00, 0x00, 0x00]], dtype=np.uint8)
+    i, j = 0, 0
+
+    for row in array:
+        # print("row: ", hex(row))
+        byte_matrix[i, j] = (row & 0xff000000) >> 3 * 8
+        i += 1
+        byte_matrix[i, j] = (row & 0x00ff0000) >> 2 * 8
+        i += 1
+        byte_matrix[i, j] = (row & 0x0000ff00) >> 1 * 8
+        i += 1
+        byte_matrix[i, j] = (row & 0x000000ff)
+
+        j += 1
+        i = 0
+        # print("byte_matrix so far:\n", byte_matrix)
+
+    return byte_matrix
+
+def cipher(input, key, type):
+    Nb = get_Nb(type)
+    Nr = get_Nr(type)
+
+    print("input:\n", input)
+    state = input.reshape(4, 4).T
+    print("state:\n", state)
+    print("key:\n", key)
+    w = key_expansion(key, type)
+    print("w:\n", w)
+
+    print(create_byte_matrix(w[0:4]))
+
+    state = add_round_key(state, create_byte_matrix(w[0:Nb]))  # See Sec. 5.1.4
+
+
+    for round in range(1, Nr):  # for round = 1 step 1 to Nr–1: #todo: make sure range is good
+        print("\nround:\n", round)
+        print("start of round:\n", state)
+        state = sub_bytes(state)  # See Sec. 5.1.1
+        print("\nafter sub_bytes:\n", state)
+        state = shift_rows(state)  # See Sec. 5.1.2
+        print("\nafter shift_rows:\n", state)
+        state = mix_columns(state)  # See Sec. 5.1.3
+        print("\nafter mix_columns:\n", state)
+        state = add_round_key(state, create_byte_matrix(w[round * Nb:(round + 1) * Nb]))
+        print("round Key value:\n", create_byte_matrix(w[round * Nb:(round + 1) * Nb]))
+
+    print("\nround: 10 (special round)\n")
+    print("start of round:\n", state)
+    state = sub_bytes(state)
+    print("\nafter sub_bytes:\n", state)
+    state = shift_rows(state)
+    print("\nafter shift_rows:\n", state)
+    print("round Key value:\n", create_byte_matrix(w[Nr*Nb:(Nr + 1) * Nb]))
+    state = add_round_key(state, create_byte_matrix(w[Nr*Nb:(Nr + 1) * Nb]))
+    print("output:\n", state)
+
     return state
 
 
 if __name__ == '__main__':
     np.set_printoptions(formatter={'int': hex})
-
-
 
     # rot_word(0x09cf4f3c)
     # print("ff_mult result: " + hex(ff_mult(0x57, 0x13)))
