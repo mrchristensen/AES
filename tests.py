@@ -169,7 +169,7 @@ class TestInvCipher(TestAES):
 
         print(key)
 
-        state = parse_input_string("00112233445566778899aabbccddeeff")
+        state = parse_input_string("69c4e0d86a7b0430d8cdb78070b4c55a")
 
         print(state)
 
