@@ -35,3 +35,5 @@ class TestKeyExpansion(TestAES):
     def test_rot_word(self):
         self.assertEqual(rot_word(0x09cf4f3c), 0xcf4f3c09)
         self.assertEqual(rot_word(0x2a6c7605), 0x6c76052a)
+        self.assertEqual(rot_word(0x00ff0000), 0xff000000)
+        self.assertEqual(rot_word(0xff000000), 0x000000ff)
