@@ -256,6 +256,20 @@ def sub_bytes(state):
     return state
 
 
+def inv_sub_bytes(state):
+    # print("og state:\n", state)
+    with np.nditer(state, op_flags=['readwrite']) as it:
+        for byte in it:
+            # print("byte: ", hex(byte))
+            i = (byte & 0xf0) >> 4
+            j = byte & 0x0f
+            # print("i, j: ", hex(i), hex(j))
+            byte[...] = InvSbox[i, j]
+            # print("new byte: ", hex(byte))
+            # print("new state:\n", state)
+    return state
+
+
 def shift_rows(state):
     # print("og state:\n", state)
     for i in range(4):
