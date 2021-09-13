@@ -356,6 +356,32 @@ def cipher(input, key, type):
     return state
 
 
+def parse_input_string(input_string):
+    return np.array([int(input_string[i:i + 2], base=16) for i in range(0, len(input_string), 2)])
+
+
+def format_output(array):
+    print("array:\n", array)
+
+    return_string = ""
+
+    array = array.T
+
+    for row in array:
+        print("row: ", row)
+        for entry in row:
+            print("entry: ", hex(entry))
+            # print("str(hex(entry))[2:5]: ", str(hex(entry))[2:5])
+            # return_string += str(hex(entry))[2:5]
+            print("thing: ", "{:02x}".format(entry))
+            return_string += "{:02x}".format(entry)
+            print("return_string so far: ", return_string)
+
+    return return_string
+
+    pass
+
+
 if __name__ == '__main__':
     np.set_printoptions(formatter={'int': hex})
 
