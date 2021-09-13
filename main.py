@@ -1,4 +1,5 @@
 import numpy as np
+import sys
 
 # Rcon[] is 1-based, so the first entry is just a place holder
 Rcon = np.array([
@@ -469,20 +470,15 @@ def format_output(array):
     pass
 
 
-if __name__ == '__main__':
-    np.set_printoptions(formatter={'int': hex})
-
+def encrypt():
     print("Let's do encryption:\n")
     aes_type = None
     while aes_type != 128 and aes_type != 192 and aes_type != 256:
-        print("Input AES type (128, 192, or 256): ")
-        aes_type = int(input())
+        aes_type = int(input("Input AES type (128, 192, or 256): "))
 
-    print("Input the key: ")
-    key_input = input()
+    key_input = input("Input the key: ")
 
-    print("Input the message: ")
-    plain_text = input()
+    plain_text = input("Input the message: ")
 
     parsed_plain_text = parse_input_string(plain_text)
     print("parsed_plain_text:\n", parsed_plain_text)
@@ -494,4 +490,19 @@ if __name__ == '__main__':
 
     formatted_output = format_output(output)
     print("output (formatted): ", formatted_output)
+
+
+if __name__ == '__main__':
+    np.set_printoptions(formatter={'int': hex})
+
+    while True:
+        mode = input("Input the mode (encrypt or decrypt): ")
+
+        if mode == "encrypt":
+            encrypt()
+        elif mode == "decrypt":
+            pass
+        elif mode == "exit":
+            exit()
+
 
