@@ -3,7 +3,7 @@ import numpy as np
 import main as AES
 
 from main import xtime, ff_mult, sub_word, rot_word, key_expansion, sub_bytes, shift_rows, mix_columns, add_round_key,\
-                 cipher, create_byte_matrix, parse_input_string, format_output, inv_sub_bytes
+                 cipher, create_byte_matrix, parse_input_string, format_output, inv_sub_bytes, inv_shift_rows
 
 
 class TestAES(unittest.TestCase):
@@ -130,6 +130,28 @@ class TestInvCipher(TestAES):
 
         self.assertTrue(np.array_equal(sub_result, sub_expected_result))
 
+    def test_inv_shift_rows(self):
+        np.set_printoptions(formatter={'int': hex})
+        state = np.array([[0x7a, 0xd5, 0xfd, 0xa7],
+                          [0x89, 0xef, 0x4e, 0x27],
+                          [0x2b, 0xca, 0x10, 0x0b],
+                          [0x3d, 0x9f, 0xf5, 0x9f]], dtype=np.uint8).T
+
+        print("before state:\n", state)
+
+        shift_expected_result = np.array([[0x7a, 0x9f, 0x10, 0x27],
+                                          [0x89, 0xd5, 0xf5, 0x0b],
+                                          [0x2b, 0xef, 0xfd, 0x9f],
+                                          [0x3d, 0xca, 0x4e, 0xa7]], dtype=np.uint8).T
+
+        shift_result = inv_shift_rows(state)
+
+        print("expected state:\n", shift_expected_result)
+        print("actual state:\n", shift_result)
+
+        self.assertTrue(np.array_equal(shift_result, shift_expected_result))
+
+
 
 class TestCipher(TestAES):
     def test_sub_bytes(self):
@@ -155,6 +177,8 @@ class TestCipher(TestAES):
                           [0x11, 0x98, 0x5d, 0x52],
                           [0xae, 0xf1, 0xe5, 0x30]], dtype=np.uint8)
 
+        print("before state:\n", state)
+
         shift_expected_result = np.array([[0xd4, 0xe0, 0xb8, 0x1e],
                                           [0xbf, 0xb4, 0x41, 0x27],
                                           [0x5d, 0x52, 0x11, 0x98],
@@ -163,6 +187,7 @@ class TestCipher(TestAES):
         shift_result = shift_rows(state)
 
         print("expected state:\n", shift_expected_result)
+        print("actual state:\n", shift_result)
 
         self.assertTrue(np.array_equal(shift_result, shift_expected_result))
 
