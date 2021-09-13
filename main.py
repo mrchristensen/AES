@@ -230,7 +230,7 @@ def key_expansion(key, AES_type):  # Nk = Number of 32-bit words comprising the 
     while i < Nb * (Nr + 1):
         temp = word[i - 1]
         print("temp:\n", temp)
-        if i:
+        if i % Nk == 0:
             temp = sub_word(rot_word(temp)) ^ Rcon[int(i / Nk)]
         elif Nk > 6 and i % Nk == 4:
             temp = sub_word(temp)
