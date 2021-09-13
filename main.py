@@ -309,6 +309,21 @@ def mix_columns(state):
     return state
 
 
+def inv_mix_columns(state):
+    # print("og state:\n", state)
+    state_copy = np.copy(state)
+    for c in range(4):
+        # print("\ncol: ", c)
+        state[0, c] = ff_mult(state_copy[0, c], 0x0e) ^ ff_mult(state_copy[1, c], 0x0b) ^ ff_mult(state_copy[2, c], 0x0d) ^ ff_mult(state_copy[3, c], 0x09)
+        state[1, c] = ff_mult(state_copy[0, c], 0x09) ^ ff_mult(state_copy[1, c], 0x0e) ^ ff_mult(state_copy[2, c], 0x0b) ^ ff_mult(state_copy[3, c], 0x0d)
+        state[2, c] = ff_mult(state_copy[0, c], 0x0d) ^ ff_mult(state_copy[1, c], 0x09) ^ ff_mult(state_copy[2, c], 0x0e) ^ ff_mult(state_copy[3, c], 0x0b)
+        state[3, c] = ff_mult(state_copy[0, c], 0x0b) ^ ff_mult(state_copy[1, c], 0x0d) ^ ff_mult(state_copy[2, c], 0x09) ^ ff_mult(state_copy[3, c], 0x0e)
+        # print("new state:\n", state)
+
+    # print("final state:\n", state)
+    return state
+
+
 def add_round_key(state, w):
     # return np.bitwise_or(state, w)
     new_state = np.array([[0x00, 0x00, 0x00, 0x00],
