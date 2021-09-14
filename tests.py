@@ -307,65 +307,80 @@ class TestMain(TestAES):
     def test_AES_128_cipher(self):
         np.set_printoptions(formatter={'int': hex})
 
-        plain_text = "00112233445566778899aabbccddeeff"
         key_string = "000102030405060708090a0b0c0d0e0f"
+        plain_text = "00112233445566778899aabbccddeeff"
         expected_output = "69c4e0d86a7b0430d8cdb78070b4c55a"
 
         parsed_plain_text = parse_input_string(plain_text)
-        print("parsed_plain_text:\n", parsed_plain_text)
         parsed_key = parse_input_string(key_string)
-        print("parsed_key:\n", parsed_key)
 
         output = cipher(parsed_plain_text, parsed_key, 128)
 
-        print("output (un=formatted): ", output)
-
         formatted_output = format_output(output)
 
-        print("output (formatted): ", formatted_output)
+        self.assertEqual(formatted_output, expected_output)
+
+    def test_AES_128_inv_cipher(self):
+        key_string = "000102030405060708090a0b0c0d0e0f"
+        plain_text = "69c4e0d86a7b0430d8cdb78070b4c55a"
+        expected_output = "00112233445566778899aabbccddeeff"
+
+        parsed_plain_text = parse_input_string(plain_text)
+        parsed_key = parse_input_string(key_string)
+
+        output = inv_cipher(parsed_plain_text, parsed_key, 128)
+        formatted_output = format_output(output)
 
         self.assertEqual(formatted_output, expected_output)
 
     def test_AES_192_cipher(self):
-        np.set_printoptions(formatter={'int': hex})
-
-        plain_text = "00112233445566778899aabbccddeeff"
         key_string = "000102030405060708090a0b0c0d0e0f1011121314151617"
+        plain_text = "00112233445566778899aabbccddeeff"
         expected_output = "dda97ca4864cdfe06eaf70a0ec0d7191"
 
         parsed_plain_text = parse_input_string(plain_text)
-        print("parsed_plain_text:\n", parsed_plain_text)
         parsed_key = parse_input_string(key_string)
-        print("parsed_key:\n", parsed_key)
 
         output = cipher(parsed_plain_text, parsed_key, 192)
-
-        print("output (un=formatted): ", output)
-
         formatted_output = format_output(output)
 
-        print("output (formatted): ", formatted_output)
+        self.assertEqual(formatted_output, expected_output)
+
+    def test_AES_192_inv_cipher(self):
+        key_string = "000102030405060708090a0b0c0d0e0f1011121314151617"
+        plain_text = "dda97ca4864cdfe06eaf70a0ec0d7191"
+        expected_output = "00112233445566778899aabbccddeeff"
+
+        parsed_plain_text = parse_input_string(plain_text)
+        parsed_key = parse_input_string(key_string)
+
+        output = inv_cipher(parsed_plain_text, parsed_key, 192)
+        formatted_output = format_output(output)
 
         self.assertEqual(formatted_output, expected_output)
 
     def test_AES_256_cipher(self):
-        np.set_printoptions(formatter={'int': hex})
-
-        plain_text = "00112233445566778899aabbccddeeff"
         key_string = "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
+        plain_text = "00112233445566778899aabbccddeeff"
         expected_output = "8ea2b7ca516745bfeafc49904b496089"
 
         parsed_plain_text = parse_input_string(plain_text)
-        print("parsed_plain_text:\n", parsed_plain_text)
         parsed_key = parse_input_string(key_string)
-        print("parsed_key:\n", parsed_key)
 
         output = cipher(parsed_plain_text, parsed_key, 256)
-
-        print("output (un=formatted): ", output)
-
         formatted_output = format_output(output)
 
-        print("output (formatted): ", formatted_output)
+        self.assertEqual(formatted_output, expected_output)
+
+    def test_AES_256_inv_cipher(self):
+        key_string = "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
+        plain_text = "8ea2b7ca516745bfeafc49904b496089"
+        expected_output = "00112233445566778899aabbccddeeff"
+
+        parsed_plain_text = parse_input_string(plain_text)
+        parsed_key = parse_input_string(key_string)
+
+        output = inv_cipher(parsed_plain_text, parsed_key, 256)
+        formatted_output = format_output(output)
 
         self.assertEqual(formatted_output, expected_output)
