@@ -430,23 +430,23 @@ def inv_cipher(input, key, type):
     state = add_round_key(state, create_byte_matrix(w[Nr * Nb:(Nr + 1) * Nb]))  # See Sec. 5.1.4
 
     for round in reversed(range(1, Nr)):  # for round = 1 step 1 to Nr–1
-        print("round[", round, "].istart\t", format_output(state))
+        print("round[", 10 - round, "].istart\t", format_output(state))
 
         # print("\nround:\n", round)
         # print("start of round:\n", state)
 
         state = inv_shift_rows(state)  # See Sec. 5.1.2
-        print("round[", round, "].is_row\t", format_output(state))
+        print("round[", 10 - round, "].is_row\t", format_output(state))
         # print("\nafter inv_shift_rows:\n", state)
         state = inv_sub_bytes(state)  # See Sec. 5.1.1
-        print("round[", round, "].is_box\t", format_output(state))
+        print("round[", 10 - round, "].is_box\t", format_output(state))
         # print("\nafter inv_sub_bytes:\n", state)
         state = add_round_key(state, create_byte_matrix(w[round * Nb:(round + 1) * Nb]))
-        print("round[", round, "].ik_sch\t", format_output(create_byte_matrix(w[round * Nb:(round + 1) * Nb])))
-        print("round[", round, "].ik_add\t", format_output(state))
+        print("round[", 10 - round, "].ik_sch\t", format_output(create_byte_matrix(w[round * Nb:(round + 1) * Nb])))
+        print("round[", 10 - round, "].ik_add\t", format_output(state))
         # print("round Key value:\n", create_byte_matrix(w[round * Nb:(round + 1) * Nb]))
         state = inv_mix_columns(state)  # See Sec. 5.1.3
-        print("round[", round, "].im_col\t", format_output(state))
+        print("round[", 10 - round, "].im_col\t", format_output(state))
         # print("\nafter inv_mix_columns:\n", state)
 
     print("round[ 10].istart\t", format_output(state))
