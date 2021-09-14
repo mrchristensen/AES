@@ -367,38 +367,49 @@ def cipher(input, key, type):
     Nb = get_Nb(type)
     Nr = get_Nr(type)
 
-    print("input:\n", input)
+    print("round[ 0 ].input\t", format_input(input))
+    print("round[ 0 ].k_sch\t", format_input(key))
     state = input.reshape(4, 4).T
-    print("state:\n", state)
-    print("key:\n", key)
+    # print("state:\n", state)
+    # print("key:\n", key)
     w = key_expansion(key, type)
-    print("w:\n", w)
+    # print("w:\n", w)
 
-    print(create_byte_matrix(w[0:4]))
+    # print(create_byte_matrix(w[0:4]))
 
     state = add_round_key(state, create_byte_matrix(w[0:Nb]))  # See Sec. 5.1.4
 
     for round in range(1, Nr):  # for round = 1 step 1 to Nr–1: #todo: make sure range is good
-        print("\nround:\n", round)
-        print("start of round:\n", state)
-        state = sub_bytes(state)  # See Sec. 5.1.1
-        print("\nafter sub_bytes:\n", state)
-        state = shift_rows(state)  # See Sec. 5.1.2
-        print("\nafter shift_rows:\n", state)
-        state = mix_columns(state)  # See Sec. 5.1.3
-        print("\nafter mix_columns:\n", state)
-        state = add_round_key(state, create_byte_matrix(w[round * Nb:(round + 1) * Nb]))
-        print("round Key value:\n", create_byte_matrix(w[round * Nb:(round + 1) * Nb]))
+        print("round[", round, "].start\t", format_output(state))
 
-    print("\nround: 10 (special round)\n")
-    print("start of round:\n", state)
+        state = sub_bytes(state)  # See Sec. 5.1.1
+        print("round[", round, "].s_box\t", format_output(state))
+        # print("\nafter sub_bytes:\n", state)
+        state = shift_rows(state)  # See Sec. 5.1.2
+        print("round[", round, "].s_row\t", format_output(state))
+        # print("\nafter shift_rows:\n", state)
+        state = mix_columns(state)  # See Sec. 5.1.3
+        print("round[", round, "].m_col\t", format_output(state))
+        # print("\nafter mix_columns:\n", state)
+        state = add_round_key(state, create_byte_matrix(w[round * Nb:(round + 1) * Nb]))
+        print("round[", round, "].k_sch\t", format_output(create_byte_matrix(w[round * Nb:(round + 1) * Nb])))
+        # print("round Key value:\n", create_byte_matrix(w[round * Nb:(round + 1) * Nb]))
+
+    print("round[ 10].start\t", format_output(state))
+
+    # print("start of round:\n", state)
     state = sub_bytes(state)
-    print("\nafter sub_bytes:\n", state)
+    print("round[ 10].s_box\t", format_output(state))
+    # print("\nafter sub_bytes:\n", state)
     state = shift_rows(state)
-    print("\nafter shift_rows:\n", state)
-    print("round Key value:\n", create_byte_matrix(w[Nr * Nb:(Nr + 1) * Nb]))
+    print("round[ 10].s_row\t", format_output(state))
+    # print("\nafter shift_rows:\n", state)
+    # print("round Key value:\n", create_byte_matrix(w[Nr * Nb:(Nr + 1) * Nb]))
     state = add_round_key(state, create_byte_matrix(w[Nr * Nb:(Nr + 1) * Nb]))
-    print("output:\n", state)
+    print("round[ 10].k_sch\t", format_output(create_byte_matrix(w[Nr * Nb:(Nr + 1) * Nb])))
+
+    print("round[ 10].output\t", format_output(state))
+    # print("output:\n", state)
 
     return state
 
@@ -407,39 +418,53 @@ def inv_cipher(input, key, type):
     Nb = get_Nb(type)
     Nr = get_Nr(type)
 
-    print("input:\n", input)
+    print("round[ 0 ].iinput\t", format_input(input))
+    print("round[ 0 ].ik_sch\t", format_input(key))
+    # print("input:\n", input)
     state = input.reshape(4, 4).T
-    print("state:\n", state)
-    print("key:\n", key)
+    # print("state:\n", state)
+    # print("key:\n", key)
     w = key_expansion(key, type)
-    print("w:\n", w)
+    # print("w:\n", w)
 
     state = add_round_key(state, create_byte_matrix(w[Nr * Nb:(Nr + 1) * Nb]))  # See Sec. 5.1.4
 
-    for round in reversed(range(1, Nr)):  # for round = 1 step 1 to Nr–1: #todo: make sure range is good
-        print("\nround:\n", round)
-        print("start of round:\n", state)
+    for round in reversed(range(1, Nr)):  # for round = 1 step 1 to Nr–1
+        print("round[", round, "].istart\t", format_output(state))
+
+        # print("\nround:\n", round)
+        # print("start of round:\n", state)
 
         state = inv_shift_rows(state)  # See Sec. 5.1.2
-        print("\nafter inv_shift_rows:\n", state)
+        print("round[", round, "].is_row\t", format_output(state))
+        # print("\nafter inv_shift_rows:\n", state)
         state = inv_sub_bytes(state)  # See Sec. 5.1.1
-        print("\nafter inv_sub_bytes:\n", state)
+        print("round[", round, "].is_box\t", format_output(state))
+        # print("\nafter inv_sub_bytes:\n", state)
         state = add_round_key(state, create_byte_matrix(w[round * Nb:(round + 1) * Nb]))
-        print("round Key value:\n", create_byte_matrix(w[round * Nb:(round + 1) * Nb]))
+        print("round[", round, "].ik_sch\t", format_output(create_byte_matrix(w[round * Nb:(round + 1) * Nb])))
+        print("round[", round, "].ik_add\t", format_output(state))
+        # print("round Key value:\n", create_byte_matrix(w[round * Nb:(round + 1) * Nb]))
         state = inv_mix_columns(state)  # See Sec. 5.1.3
-        print("\nafter inv_mix_columns:\n", state)
+        print("round[", round, "].im_col\t", format_output(state))
+        # print("\nafter inv_mix_columns:\n", state)
 
-    print("\nround: 10 (special round)\n")
-    print("start of round:\n", state)
+    print("round[ 10].istart\t", format_output(state))
+    # print("\nround: 10 (special round)\n")
+    # print("start of round:\n", state)
 
     state = inv_shift_rows(state)
-    print("\nafter inv_shift_rows:\n", state)
+    print("round[ 10].is_row\t", format_output(state))
+    # print("\nafter inv_shift_rows:\n", state)
     state = inv_sub_bytes(state)
-    print("\nafter inv_sub_bytes:\n", state)
-    print("round Key value:\n", create_byte_matrix(w[0:Nb]))
+    print("round[ 10].is_box\t", format_output(state))
+    # print("\nafter inv_sub_bytes:\n", state)
+    # print("round Key value:\n", create_byte_matrix(w[0:Nb]))
     state = add_round_key(state, create_byte_matrix(w[0:Nb]))
+    print("round[ 10].ik_sch\t", format_output(create_byte_matrix(w[0:Nb])))
 
-    print("output:\n", state)
+    print("round[ 10].ioutput\t", format_output(state))
+    # print("output:\n", state)
 
     return state
 
@@ -449,25 +474,41 @@ def parse_input_string(input_string):
 
 
 def format_output(array):
-    print("array:\n", array)
+    # print("array:\n", array)
 
     return_string = ""
 
     array = array.T
 
     for row in array:
-        print("row: ", row)
+        # print("row: ", row)
         for entry in row:
-            print("entry: ", hex(entry))
+            # print("entry: ", hex(entry))
             # print("str(hex(entry))[2:5]: ", str(hex(entry))[2:5])
             # return_string += str(hex(entry))[2:5]
-            print("thing: ", "{:02x}".format(entry))
+            # print("thing: ", "{:02x}".format(entry))
             return_string += "{:02x}".format(entry)
-            print("return_string so far: ", return_string)
+            # print("return_string so far: ", return_string)
 
     return return_string
 
-    pass
+
+def format_input(array):
+    # print("array:\n", array)
+
+    return_string = ""
+
+    array = array.T
+
+    for entry in array:
+        # print("entry: ", hex(entry))
+        # print("str(hex(entry))[2:5]: ", str(hex(entry))[2:5])
+        # return_string += str(hex(entry))[2:5]
+        # print("thing: ", "{:02x}".format(entry))
+        return_string += "{:02x}".format(entry)
+        # print("return_string so far: ", return_string)
+
+    return return_string
 
 
 def encrypt():
@@ -481,15 +522,15 @@ def encrypt():
     plain_text = input("Input the message: ")
 
     parsed_plain_text = parse_input_string(plain_text)
-    print("parsed_plain_text:\n", parsed_plain_text)
+    # print("parsed_plain_text:\n", parsed_plain_text)
     parsed_key = parse_input_string(key_input)
-    print("parsed_key:\n", parsed_key)
+    # print("parsed_key:\n", parsed_key)
 
     output = cipher(parsed_plain_text, parsed_key, aes_type)
-    print("output (un=formatted): ", output)
+    # print("output (un=formatted): ", output)
 
     formatted_output = format_output(output)
-    print("output (formatted): ", formatted_output)
+    # print("output (formatted): ", formatted_output)
 
 
 def decrypt():
@@ -503,19 +544,19 @@ def decrypt():
     encrypted_text = input("Input the message: ")
 
     parsed_encrypted_text = parse_input_string(encrypted_text)
-    print("parsed_encrypted_text:\n", parsed_encrypted_text)
+    # print("parsed_encrypted_text:\n", parsed_encrypted_text)
     parsed_key = parse_input_string(key_input)
-    print("parsed_key:\n", parsed_key)
+    # print("parsed_key:\n", parsed_key)
 
     output = inv_cipher(parsed_encrypted_text, parsed_key, aes_type)
-    print("output (un=formatted): ", output)
+    # print("output (un=formatted): ", output)
 
     formatted_output = format_output(output)
-    print("output (formatted): ", formatted_output)
+    # print("output (formatted): ", formatted_output)
 
 
 if __name__ == '__main__':
-    np.set_printoptions(formatter={'int': hex})
+    # np.set_printoptions(formatter={'int': hex})
 
     while True:
         mode = input("Input the mode (encrypt or decrypt): ")
@@ -526,5 +567,3 @@ if __name__ == '__main__':
             decrypt()
         elif mode == "exit":
             exit()
-
-
